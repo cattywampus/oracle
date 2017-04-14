@@ -46,7 +46,7 @@ end
 end
 
 # We need unzip to expand the install files later on.
-yum_package 'unzip'
+yum_package 'unzip' if platform_family?('rhel')
 
 # Fetching the install media with curl and unzipping them.
 # We run two resources to avoid chef-client's runaway memory usage resulting
@@ -102,7 +102,7 @@ end
 # prerequisites are indeed met on CentOS 6.4.
 
 if node[:oracle][:rdbms][:dbbin_version] == "11g"
- 
+
   bash 'run_rdbms_installer' do
     cwd "#{node[:oracle][:rdbms][:install_dir]}/database"
     environment (node[:oracle][:rdbms][:env])
@@ -113,20 +113,20 @@ if node[:oracle][:rdbms][:dbbin_version] == "11g"
   execute 'root.sh_rdbms' do
     command "#{node[:oracle][:rdbms][:ora_home]}/root.sh"
   end
- 
+
   template "#{node[:oracle][:rdbms][:ora_home]}/network/admin/listener.ora" do
     owner 'oracle'
     group 'oinstall'
     mode '0644'
   end
-  # Starting listener 
+  # Starting listener
   execute 'start_listener' do
     command "#{node[:oracle][:rdbms][:ora_home]}/bin/lsnrctl start"
     user 'oracle'
     group 'oinstall'
     environment (node[:oracle][:rdbms][:env])
   end
- 
+
   # Install sqlplus startup config file.
   cookbook_file "#{node[:oracle][:rdbms][:ora_home]}/sqlplus/admin/glogin.sql" do
     owner 'oracle'
@@ -140,32 +140,32 @@ if node[:oracle][:rdbms][:dbbin_version] == "11g"
   end
 
 else
- 
+
   bash 'run_rdbms_installer' do
     cwd "#{node[:oracle][:rdbms][:install_dir]}/database"
     environment (node[:oracle][:rdbms][:env_12c])
     code "sudo -Eu oracle ./runInstaller -showProgress -silent -waitforcompletion -ignoreSysPrereqs -responseFile #{node[:oracle][:rdbms][:install_dir]}/db12c.rsp -invPtrLoc #{node[:oracle][:ora_base]}/oraInst.loc"
     returns [0, 6]
   end
- 
+
   execute 'root.sh_rdbms' do
     command "#{node[:oracle][:rdbms][:ora_home_12c]}/root.sh"
   end
- 
+
   # Commented out to get DBEXPRESS work out of the box
   #template "#{node[:oracle][:rdbms][:ora_home_12c]}/network/admin/listener.ora" do
   #  owner 'oracle'
   #  group 'oinstall'
   #  mode '0644'
   #end
- 
+
   execute 'start_listener' do
     command "#{node[:oracle][:rdbms][:ora_home_12c]}/bin/lsnrctl start"
     user 'oracle'
     group 'oinstall'
     environment (node[:oracle][:rdbms][:env_12c])
   end
- 
+
   # Install sqlplus startup config file.
   cookbook_file "#{node[:oracle][:rdbms][:ora_home_12c]}/sqlplus/admin/glogin.sql" do
     owner 'oracle'

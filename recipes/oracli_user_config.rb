@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 #
-## Create and configure the oracle client user. 
+## Create and configure the oracle client user.
 #
 
 
@@ -35,7 +35,7 @@ user 'oracli' do
   supports :manage_home => true
 end
 
-yum_package File.basename(node[:oracle][:cliuser][:shell])
+yum_package File.basename(node[:oracle][:cliuser][:shell]) if platform_family?('rhel')
 
 # Configure the oracli user.
 # Make it a member of the appropriate supplementary groups, and
@@ -74,7 +74,7 @@ unless node[:oracle][:cliuser][:pw_set]
   execute 'change_oracli_user_pw' do
     command "echo oracli:#{ora_pw} | /usr/sbin/chpasswd"
   end
-  
+
   ruby_block 'set_pw_attr' do
     block do
       node.set[:oracle][:cliuser][:pw_set] = true

@@ -39,7 +39,7 @@ end
 end
 
 # We need unzip to expand the install files later on.
-yum_package 'unzip'
+yum_package 'unzip' if platform_family?('rhel')
 
 # Fetching the install media with curl and unzipping them.
 # We run two resources to avoid chef-client's runaway memory usage resulting

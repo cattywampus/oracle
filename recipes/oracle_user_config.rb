@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 #
-## Create and configure the oracle user. 
+## Create and configure the oracle user.
 #
 
 
@@ -35,7 +35,7 @@ user 'oracle' do
   supports :manage_home => true
 end
 
-yum_package File.basename(node[:oracle][:user][:shell])
+yum_package File.basename(node[:oracle][:user][:shell]) if platform_family?('rhel')
 
 # Configure the oracle user.
 # Make it a member of the appropriate supplementary groups, and
@@ -74,7 +74,7 @@ unless node[:oracle][:user][:pw_set]
   execute 'change_oracle_user_pw' do
     command "echo oracle:#{ora_pw} | /usr/sbin/chpasswd"
   end
-  
+
   ruby_block 'set_pw_attr' do
     block do
       node.set[:oracle][:user][:pw_set] = true

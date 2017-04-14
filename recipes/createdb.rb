@@ -61,7 +61,7 @@ node[:oracle][:rdbms][:dbs].each_key do |db|
     next
   end
 
-  ## Create database. 
+  ## Create database.
   if node[:oracle][:rdbms][:dbbin_version] == "12c"
     # 12c
     bash "dbca_createdb_#{db}" do
@@ -99,7 +99,7 @@ node[:oracle][:rdbms][:dbs].each_key do |db|
       end
       action :create
     end
-    
+
     # Configure dbcontrol.
     if node[:oracle][:rdbms][:dbconsole][:emconfig]
       # Creating em.rsp file for dbcontrol.
@@ -143,12 +143,12 @@ node[:oracle][:rdbms][:dbs].each_key do |db|
         environment (node[:oracle][:rdbms][:env])
       end
     end
-    
+
     # Making sure shred is available
     yum_package "coreutils" do
       action :install
       arch 'x86_64'
-    end
+    end if platform_family?('rhel')
 
     # Shreding the em.rsp to get rid of the passwords.
     execute "shred_em_rsp_#{db}" do

@@ -18,5 +18,5 @@
 #
 
 node[:oracle][:rdbms][:deps].each do |dep|
-  yum_package dep
+  yum_package dep if platform_family?('rhel')
 end
